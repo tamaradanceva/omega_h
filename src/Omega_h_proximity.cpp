@@ -14,13 +14,15 @@ static Reals get_edge_pad_isos(
     Mesh* mesh, Real factor, Read<I8> edges_are_bridges) {
   auto coords = mesh->coords();
   auto edges2verts = mesh->ask_verts_of(EDGE);
-  auto out = Write<Real>(mesh->nedges(), 0.0);
+  auto out = Write<Real>(mesh->nedges() * symm_ncomps(dim), 0.0);
   auto f = OMEGA_H_LAMBDA(LO edge) {
     if (!edges_are_bridges[edge]) return;
     auto eev2v = gather_verts<2>(edges2verts, edge);
     auto eev2x = gather_vectors<2, dim>(coords, eev2v);
-    auto h = norm(eev2x[1] - eev2x[0]) * factor;
-    out[edge] = metric_eigenvalue_from_length(h);
+    auto d = eev2x[1] - eev2x[0];
+    auto d_inv = pseudo_invert(d);
+    auto m = outer_product(d_inv) / square(factor);
+    set_symm(out, edge, m);
   };
   parallel_for(mesh->nedges(), f);
   return out;
@@ -32,7 +34,7 @@ static Reals get_tri_pad_isos(
   auto coords = mesh->coords();
   auto tris2verts = mesh->ask_verts_of(TRI);
   auto tris2edges = mesh->ask_down(TRI, EDGE).ab2b;
-  auto out = Write<Real>(mesh->ntris(), 0.0);
+  auto out = Write<Real>(mesh->ntris() * , 0.0);
   auto f = OMEGA_H_LAMBDA(LO tri) {
     auto ttv2v = gather_verts<3>(tris2verts, tri);
     auto ttv2x = gather_vectors<3, dim>(coords, ttv2v);
