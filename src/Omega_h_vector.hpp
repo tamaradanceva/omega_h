@@ -11,9 +11,9 @@ class Vector : public Few<Real, n> {
  public:
   OMEGA_H_INLINE Vector() {}
   inline Vector(std::initializer_list<Real> l) : Few<Real, n>(l) {}
-  OMEGA_H_INLINE void operator=(Vector<n> const& rhs) volatile {
-    Few<Real, n>::operator=(rhs);
-  }
+//OMEGA_H_INLINE void operator=(Vector<n> const& rhs) volatile {
+//  Few<Real, n>::operator=(rhs);
+//}
   OMEGA_H_INLINE void operator=(Vector<n> const& rhs) {
     Few<Real, n>::operator=(rhs);
   }
@@ -22,12 +22,12 @@ class Vector : public Few<Real, n> {
 #define OMEGA_H_VECTOR_AT return Few<Real, n>::operator[](i)
   OMEGA_H_INLINE Real& operator()(Int i) { OMEGA_H_VECTOR_AT; }
   OMEGA_H_INLINE Real const& operator()(Int i) const { OMEGA_H_VECTOR_AT; }
-  OMEGA_H_INLINE Real volatile& operator()(Int i) volatile {
-    OMEGA_H_VECTOR_AT;
-  }
-  OMEGA_H_INLINE Real const volatile& operator()(Int i) const volatile {
-    OMEGA_H_VECTOR_AT;
-  }
+//OMEGA_H_INLINE Real volatile& operator()(Int i) volatile {
+//  OMEGA_H_VECTOR_AT;
+//}
+//OMEGA_H_INLINE Real const volatile& operator()(Int i) const volatile {
+//  OMEGA_H_VECTOR_AT;
+//}
 #undef OMEGA_H_VECTOR_AT
 };
 

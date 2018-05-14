@@ -23,8 +23,8 @@ class Few {
   enum { size = n };
   OMEGA_H_INLINE T* data() { return array_; }
   OMEGA_H_INLINE T const* data() const { return array_; }
-  OMEGA_H_INLINE T volatile* data() volatile { return array_; }
-  OMEGA_H_INLINE T const volatile* data() const volatile { return array_; }
+//OMEGA_H_INLINE T volatile* data() volatile { return array_; }
+//OMEGA_H_INLINE T const volatile* data() const volatile { return array_; }
 #ifdef OMEGA_H_CHECK_BOUNDS
 #define OMEGA_H_FEW_AT                                                         \
   OMEGA_H_CHECK(0 <= i);                                                       \
@@ -35,10 +35,10 @@ class Few {
 #endif
   OMEGA_H_INLINE T& operator[](Int i) { OMEGA_H_FEW_AT; }
   OMEGA_H_INLINE T const& operator[](Int i) const { OMEGA_H_FEW_AT; }
-  OMEGA_H_INLINE T volatile& operator[](Int i) volatile { OMEGA_H_FEW_AT; }
-  OMEGA_H_INLINE T const volatile& operator[](Int i) const volatile {
-    OMEGA_H_FEW_AT;
-  }
+//OMEGA_H_INLINE T volatile& operator[](Int i) volatile { OMEGA_H_FEW_AT; }
+//OMEGA_H_INLINE T const volatile& operator[](Int i) const volatile {
+//  OMEGA_H_FEW_AT;
+//}
 #undef OMEGA_H_FEW_AT
   Few(std::initializer_list<T> l) {
     Int i = 0;
@@ -48,21 +48,21 @@ class Few {
   }
   OMEGA_H_INLINE Few() {}
   OMEGA_H_INLINE ~Few() {}
-  OMEGA_H_INLINE void operator=(Few<T, n> const& rhs) volatile {
-    for (Int i = 0; i < n; ++i) array_[i] = rhs[i];
-  }
+//OMEGA_H_INLINE void operator=(Few<T, n> const& rhs) volatile {
+//  for (Int i = 0; i < n; ++i) array_[i] = rhs[i];
+//}
   OMEGA_H_INLINE void operator=(Few<T, n> const& rhs) {
     for (Int i = 0; i < n; ++i) array_[i] = rhs[i];
   }
-  OMEGA_H_INLINE void operator=(Few<T, n> const volatile& rhs) {
-    for (Int i = 0; i < n; ++i) array_[i] = rhs[i];
-  }
+//OMEGA_H_INLINE void operator=(Few<T, n> const volatile& rhs) {
+//  for (Int i = 0; i < n; ++i) array_[i] = rhs[i];
+//}
   OMEGA_H_INLINE Few(Few<T, n> const& rhs) {
     for (Int i = 0; i < n; ++i) new (array_ + i) T(rhs[i]);
   }
-  OMEGA_H_INLINE Few(Few<T, n> const volatile& rhs) {
-    for (Int i = 0; i < n; ++i) new (array_ + i) T(rhs[i]);
-  }
+//OMEGA_H_INLINE Few(Few<T, n> const volatile& rhs) {
+//  for (Int i = 0; i < n; ++i) new (array_ + i) T(rhs[i]);
+//}
 };
 
 template <Int capacity, typename T>

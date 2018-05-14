@@ -17,7 +17,7 @@ struct BBoxFunctor {
     }
   }
   OMEGA_H_INLINE void join(
-      volatile value_type& update, const volatile value_type& input) const {
+      value_type& update, const value_type& input) const {
     update = unite(update, input);
   }
   OMEGA_H_DEVICE void operator()(Int i, value_type& update) const {
