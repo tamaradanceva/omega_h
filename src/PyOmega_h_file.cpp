@@ -16,6 +16,7 @@ void pybind11_file(py::module& module) {
       &vtk::write_parallel;
   void (*vtk_write_parallel)(std::string const&, Mesh*, bool) =
       &vtk::write_parallel;
+  void (*vtk_read_parallel)(filesystem::path const&, CommPtr, Mesh*) = &vtk::read_parallel;
   module.def("gmsh_read_file", gmsh_read_file, "Read a Gmsh file");
   module.def("gmsh_write_file", gmsh_write_file, "Write a Gmsh file");
   module.def("vtk_write_vtu", vtk_write_vtu, "Write a mesh as a .vtu file",
@@ -30,6 +31,7 @@ void pybind11_file(py::module& module) {
       "Write entities of one dimension as a directory of parallel VTK files",
       py::arg("path"), py::arg("mesh"), py::arg("cell_dim"),
       py::arg("compress") = true);
+  module.def("vtk_read_parallel", vtk_read_parallel, "Read a mesh as a directory of parallel VTK files");
 }
 
 }  // namespace Omega_h
