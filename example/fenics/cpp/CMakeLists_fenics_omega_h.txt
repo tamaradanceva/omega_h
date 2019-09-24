@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.0.1)
+
+project(Omega_h-DOLFIN LANGUAGES C CXX)
+
+# Set CMake behavior
+cmake_policy(SET CMP0004 NEW)
+
+find_package(DOLFIN REQUIRED)
+
+include(${DOLFIN_USE_FILE})
+
+# Default build type (can be overridden by user)
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
+      "Choose the type of build, options are: Debug MinSizeRel Release RelWithDebInfo." FORCE)
+endif()
+
+# Do not throw error for 'multi-line comments' (these are typical in
+# rst which includes LaTeX)
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-Wno-comment" HAVE_NO_MULTLINE)
+if (HAVE_NO_MULTLINE)
+  set(CMAKE_CXX_FLAGS "-Wno-comment ${CMAKE_CXX_FLAGS}")
+endif()
+
+# DOLFIN does conveniently provide us with its
+# FindPETSc and FindSLEPC modules alongside
+# its CMake configuration file
+get_filename_component(DOLFIN_MODULES_DIR "${DOLFIN_CONFIG}" DIRECTORY)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DOLFIN_MODULES_DIR}")
+
+set(OMEGA_H_PREFIX "/shared/omega_h/install")
+find_package(Omega_h REQUIRED 9.9.0 PATHS ${OMEGA_H_PREFIX} NO_DEFAULT_PATH)
+
+add_executable(omega_h-dolfin main.cpp)
+target_link_libraries(omega_h-dolfin Omega_h::omega_h dolfin)
+#target_link_libraries(omega_h-dolfin PRIVATE omega_h)

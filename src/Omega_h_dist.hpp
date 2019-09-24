@@ -3,10 +3,20 @@
 
 #include <Omega_h_comm.hpp>
 #include <Omega_h_remotes.hpp>
+#include <Omega_h_graph.hpp>
+
+/* \file Omega_h_dist.hpp
+  \brief Header file for Omega_h::Dist
+ */
 
 namespace Omega_h {
 
-/* Welcome to Dist, the magical parallel machine !
+/*! \brief an MPI distributor object which encapsulates the idea
+          of a communication pattern between lots of small
+          actors on each MPI rank.
+   
+  \details
+   Welcome to Dist, the magical parallel machine !
 
    This class implements a communication pattern
    that travels along edges of a partitioned graph.
@@ -126,6 +136,8 @@ class Dist {
   template <typename T>
   Read<T> exch(Read<T> data, Int width) const;
   template <typename T>
+  Future<T> iexch(Read<T> data, Int width) const;
+  template <typename T>
   Read<T> exch_reduce(Read<T> data, Int width, Omega_h_Op op) const;
   CommPtr parent_comm() const;
   CommPtr comm() const;
@@ -150,8 +162,18 @@ class Dist {
   enum { F, R };
 };
 
+/*! \brief Creates a Dist object that can be re-used to synchronize variable-sized data per actor
+   \param copies2owners Dist which sends data from each actor in this MPI rank to its owner
+   \param copies2data A "fan" which, for each actor in this MPI rank, points to the start of its
+                      variable-sized data in the array of all packed variable-sized data
+   \details This function assumes and does not verify that the amount of variable-sized
+            data per actor is consistent between MPI ranks.
+ */
+Dist create_dist_for_variable_sized(Dist copies2owners, LOs copies2data);
+
 #define OMEGA_H_EXPL_INST_DECL(T)                                              \
   extern template Read<T> Dist::exch(Read<T> data, Int width) const;           \
+  extern template Future<T> Dist::iexch(Read<T> data, Int width) const;        \
   extern template Read<T> Dist::exch_reduce<T>(                                \
       Read<T> data, Int width, Omega_h_Op op) const;
 OMEGA_H_EXPL_INST_DECL(I8)
