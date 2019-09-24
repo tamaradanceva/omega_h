@@ -1,17 +1,43 @@
-cmake_minimum_required(VERSION 3.0.1)
+cmake_minimum_required(VERSION 3.5)
 
-project(Omega_h-DOLFIN LANGUAGES C CXX)
+set(PROJECT_NAME demo_poisson)
+project(${PROJECT_NAME})
 
+# Set CMake behavior
+cmake_policy(SET CMP0004 NEW)
+
+# Get DOLFIN configuration data (DOLFINConfig.cmake must be in
+# DOLFIN_CMAKE_CONFIG_PATH)
 find_package(DOLFIN REQUIRED)
-# DOLFIN does conveniently provide us with its
-# FindPETSc and FindSLEPC modules alongside
-# its CMake configuration file
-get_filename_component(DOLFIN_MODULES_DIR "${DOLFIN_CONFIG}" DIRECTORY)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DOLFIN_MODULES_DIR}")
 
-#set(OMEGA_H_PREFIX "" CACHE PATH "Path to installed Omega_h")
-#find_package(Omega_h REQUIRED 9.9.0 PATHS ${OMEGA_H_PREFIX} NO_DEFAULT_PATH)
+include(${DOLFIN_USE_FILE})
 
-add_executable(omega_h-dolfin main.cpp)
-#target_link_libraries(omega_h-dolfin Omega_h::omega_h)
-target_link_libraries(omega_h-dolfin PRIVATE omega_h)
+# Default build type (can be overridden by user)
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
+      "Choose the type of build, options are: Debug MinSizeRel Release RelWithDebInfo." FORCE)
+endif()
+
+# Do not throw error for 'multi-line comments' (these are typical in
+# rst which includes LaTeX)
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-Wno-comment" HAVE_NO_MULTLINE)
+if (HAVE_NO_MULTLINE)
+  set(CMAKE_CXX_FLAGS "-Wno-comment ${CMAKE_CXX_FLAGS}")
+endif()
+
+set(OMEGA_H_PREFIX "/home/fenics/mydata/omega_h/install/")
+find_package(Omega_h REQUIRED 9.9.0 PATHS ${OMEGA_H_PREFIX} NO_DEFAULT_PATH)
+
+# Executable
+add_executable(${PROJECT_NAME} main.cpp)
+
+# Target libraries
+target_link_libraries(${PROJECT_NAME} dolfin)
+target_link_libraries(${PROJECT_NAME} Omega_h::omega_h)
+
+# Test targets
+set(test_parameters -np 3 "./${PROJECT_NAME}")
+add_test(NAME ${PROJECT_NAME}_mpi COMMAND "mpirun" ${test_parameters})
+add_test(NAME ${PROJECT_NAME}_serial COMMAND ${PROJECT_NAME})
+
